@@ -1,6 +1,6 @@
-<h3 style="font-size: 300%; text-align: center">🐍 📄 PySpark Cheat Sheet</h3>
+<h3 style="font-size: 3em !important; align: center">🐍 📄 PySpark Cheat Sheet</h3>
 
-<h3 style="text-align: center">A quick reference guide to the most commonly used patterns and functions in PySpark SQL.</h3>
+<h3 style="align: center">A quick reference guide to the most commonly used patterns and functions in PySpark SQL.</h3>
 
 ## Table of Contents
 
