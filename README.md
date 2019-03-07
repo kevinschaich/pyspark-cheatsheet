@@ -1,26 +1,27 @@
-<h1 align="center">🐍 📄 PySpark Cheat Sheet</h1>
+# PySpark Cheat Sheet
 
-<h4 align="center"><br>A quick reference guide to the most commonly used patterns and functions in PySpark SQL.</h4>
+🐍 📄 A quick reference guide to the most commonly used patterns and functions in PySpark SQL.
 
 ## Table of Contents
 
-- [Table of Contents](#table-of-contents)
-- [Common Patterns](#common-patterns)
-    - [Importing Functions & Types](#importing-functions--types)
-    - [Filtering](#filtering)
-    - [Joins](#joins)
-    - [Creating New Columns](#creating-new-columns)
-    - [Coalescing Values](#coalescing-values)
-    - [Casting, Nulls & Duplicates](#casting-nulls--duplicates)
-- [Column Operations](#column-operations)
-- [String Operations](#string-operations)
-    - [String Filters](#string-filters)
-    - [String Functions](#string-functions)
-- [Number Operations](#number-operations)
-- [Array Operations](#array-operations)
-- [Aggregation Operations](#aggregation-operations)
-    - [Repartitioning](#repartitioning)
-- [UDFs (User Defined Functions)](#udfs-user-defined-functions)
+- [PySpark Cheat Sheet](#pyspark-cheat-sheet)
+  - [Table of Contents](#table-of-contents)
+  - [Common Patterns](#common-patterns)
+      - [Importing Functions & Types](#importing-functions--types)
+      - [Filtering](#filtering)
+      - [Joins](#joins)
+      - [Creating New Columns](#creating-new-columns)
+      - [Coalescing Values](#coalescing-values)
+      - [Casting, Nulls & Duplicates](#casting-nulls--duplicates)
+  - [Column Operations](#column-operations)
+  - [String Operations](#string-operations)
+      - [String Filters](#string-filters)
+      - [String Functions](#string-functions)
+  - [Number Operations](#number-operations)
+  - [Array Operations](#array-operations)
+  - [Aggregation Operations](#aggregation-operations)
+      - [Repartitioning](#repartitioning)
+  - [UDFs (User Defined Functions)](#udfs-user-defined-functions)
 
 If you can't find what you're looking for, check out the [PySpark Official Documentation](https://spark.apache.org/docs/latest/api/python/pyspark.sql.html) and add it here!
  
