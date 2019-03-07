@@ -224,6 +224,7 @@ df = df.groupBy('gender').agg(F.max('age').alias('max_age_by_gender'))
 # Collect List - F.collect_list(col)
 df = df.groupBy('age').agg(F.collect_set('name').alias('person_names'))
 ```
+
 ## Advanced Operations
 
 #### Repartitioning
