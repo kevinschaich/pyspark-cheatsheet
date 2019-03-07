@@ -1,4 +1,4 @@
-# PySpark Cheat Sheet
+# 🐍 📄 PySpark Cheat Sheet
 
 ## Common Imports
 
