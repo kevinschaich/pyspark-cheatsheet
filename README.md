@@ -2,8 +2,6 @@
 
 🐍 📄 A quick reference guide to the most commonly used patterns and functions in PySpark SQL.
 
-<br>
-
 ## Table of Contents
 
 - [PySpark Cheat Sheet](#pyspark-cheat-sheet)
@@ -46,7 +44,7 @@ df = df.filter(df.is_adult == 'Y')
 df = df.filter(df.age > 25)
 
 # Multiple conditions require parens around each
-df = df.filter((df.age > 25) && (df.is_adult == 'Y'))
+df = df.filter((df.age > 25) & (df.is_adult == 'Y'))
 ```
 
 #### Joins
