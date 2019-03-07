@@ -1,6 +1,8 @@
-<h3 style="font-size: 3em !important; align: center">🐍 📄 PySpark Cheat Sheet</h3>
+<style>#header { color: red; }</style>
 
-<h3 style="align: center">A quick reference guide to the most commonly used patterns and functions in PySpark SQL.</h3>
+<h1 id='header' align=center>🐍 📄 PySpark Cheat Sheet</h1>
+
+<h3 align=center>A quick reference guide to the most commonly used patterns and functions in PySpark SQL.</h3>
 
 ## Table of Contents
 
