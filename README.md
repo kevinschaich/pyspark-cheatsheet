@@ -1,21 +1,16 @@
-#### Table of Contents
+# 🐍 📄 PySpark Cheat Sheet
+
+A quick reference guide to the most commonly used patterns and functions in PySpark SQL.
+
+#### Contents
 
 - [Common Patterns](#common-patterns)
-    - [Importing Functions & Types](#importing-functions--types)
-    - [Filtering](#filtering)
-    - [Joins](#joins)
-    - [Creating New Columns](#creating-new-columns)
-    - [Coalescing Values](#coalescing-values)
-    - [Casting, Nulls & Duplicates](#casting-nulls--duplicates)
 - [Column Operations](#column-operations)
 - [String Operations](#string-operations)
-    - [String Filters](#string-filters)
-    - [String Functions](#string-functions)
 - [Number Operations](#number-operations)
 - [Array Operations](#array-operations)
 - [Aggregation Operations](#aggregation-operations)
-- [Repartitioning](#repartitioning)
-- [UDFs (User Defined Functions)](#udfs-user-defined-functions)
+- [Advanced Operations](#advanced-operations)
 
 If you can't find what you're looking for, check out the [PySpark Official Documentation](https://spark.apache.org/docs/latest/api/python/pyspark.sql.html) and add it here!
  
@@ -219,15 +214,16 @@ df = df.groupBy('gender').agg(F.max('age').alias('max_age_by_gender'))
 # Collect List - F.collect_list(col)
 df = df.groupBy('age').agg(F.collect_set('name').alias('person_names'))
 ```
+## Advanced Operations
 
-## Repartitioning
+#### Repartitioning
 
 ```python
 # Repartition – df.repartition(num_output_partitions)
 df = df.repartition(1)
 ```
 
-## UDFs (User Defined Functions)
+#### UDFs (User Defined Functions)
 
 ```python
 # Multiply each row's age column by two
