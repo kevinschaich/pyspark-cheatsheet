@@ -177,7 +177,7 @@ df = df.withColumn('id', F.ltrim('id'))
 # Concatenate - F.concat(*cols)
 df = df.withColumn('full_name', F.concat('fname', F.lit(' '), 'lname'))
 
-# Concatenate with Separator/Delimiter - F.concat_ws(*cols)
+# Concatenate with Separator/Delimiter - F.concat_ws(delimiter, *cols)
 df = df.withColumn('full_name', F.concat_ws('-', 'fname', 'lname'))
 
 # Regex Replace - F.regexp_replace(str, pattern, replacement)[source]
@@ -213,11 +213,12 @@ df = df.withColumn('empty_array_column', F.array([]))
 ## Aggregation Operations
 
 ```python
-# Count - F.count()
-# Sum - F.sum(*cols)
-# Mean - F.mean(*cols)
-# Max - F.max(*cols)
-# Min - F.min(*cols)
+# Row Count:                F.count()
+# Sum of Rows in Group:     F.sum(*cols)
+# Mean of Rows in Group:    F.mean(*cols)
+# Max of Rows in Group:     F.max(*cols)
+# Min of Rows in Group:     F.min(*cols)
+# First Row in Group:       F.alias(*cols)
 df = df.groupBy('gender').agg(F.max('age').alias('max_age_by_gender'))
 
 # Collect Set - F.collect_set(col)
