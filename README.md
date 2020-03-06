@@ -16,6 +16,7 @@ A quick reference guide to the most commonly used patterns and functions in PySp
     - [String Filters](#string-filters)
     - [String Functions](#string-functions)
 - [Number Operations](#number-operations)
+- [Date Operations](#date-operations)
 - [Array Operations](#array-operations)
 - [Aggregation Operations](#aggregation-operations)
 - [Advanced Operations](#advanced-operations)
@@ -198,6 +199,22 @@ df = df.withColumn('price', F.floor('price'))
 
 # Ceiling - F.ceil(col)
 df = df.withColumn('price', F.ceil('price'))
+```
+
+## Date Operations
+
+```python
+# Convert a string of known format to a date
+df = df.withColumn('date_of_birth', F.to_date('date_of_birth', 'yyyy-MM-dd'))
+
+# Keep only rows where date_of_birth is in the year 2017 
+df = df.filter(F.year('date_of_birth') == F.lit('2017'))
+
+# Keep only rows where date_of_birth is between 2017-05-10 and 2018-07-21
+df = df.filter(
+    (F.col('date_of_birth') >= F.lit('2017-05-10')) &
+    (F.col('date_of_birth') <= F.lit('2018-07-21'))
+)
 ```
 
 ## Array Operations
