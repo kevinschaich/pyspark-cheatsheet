@@ -5,27 +5,38 @@ A quick reference guide to the most commonly used patterns and functions in PySp
 #### Table of Contents
 
 - [Common Patterns](#common-patterns)
+    - [Logging Output](#logging-output)
     - [Importing Functions & Types](#importing-functions--types)
     - [Filtering](#filtering)
     - [Joins](#joins)
-    - [Creating New Columns](#creating-new-columns)
-    - [Coalescing Values](#coalescing-values)
-    - [Casting, Nulls & Duplicates](#casting-nulls--duplicates)
-- [Column Operations](#column-operations)
+    - [Column Operations](#column-operations)
+    - [Casting & Coalescing Null Values & Duplicates](#casting--coalescing-null-values--duplicates)
 - [String Operations](#string-operations)
     - [String Filters](#string-filters)
     - [String Functions](#string-functions)
 - [Number Operations](#number-operations)
-- [Date Operations](#date-operations)
+- [Date & Timestamp Operations](#date--timestamp-operations)
 - [Array Operations](#array-operations)
 - [Aggregation Operations](#aggregation-operations)
 - [Advanced Operations](#advanced-operations)
     - [Repartitioning](#repartitioning)
-    - [UDFs (User Defined Functions)](#udfs-user-defined-functions)
+    - [UDFs (User Defined Functions](#udfs-user-defined-functions)
 
 If you can't find what you're looking for, check out the [PySpark Official Documentation](https://spark.apache.org/docs/latest/api/python/pyspark.sql.html) and add it here!
- 
+
 ## Common Patterns
+
+#### Logging Output
+
+```python
+# Within Code Workbooks
+print("example log output")
+
+# Within Code Repositories
+import logging
+logger = logging.getLogger(__name__)
+logger.info("example log output")
+```
 
 #### Importing Functions & Types
 
@@ -43,8 +54,15 @@ df = df.filter(df.is_adult == 'Y')
 # Filter on >, <, >=, <= condition
 df = df.filter(df.age > 25)
 
-# Multiple conditions require parens around each
+# Multiple conditions require parentheses around each condition
 df = df.filter((df.age > 25) & (df.is_adult == 'Y'))
+
+# Compare against a list of allowed values
+df = df.filter(col('first_name').isin([3, 4, 7]))
+
+# Sort results
+df = df.orderBy(df.age.asc()))
+df = df.orderBy(df.age.desc()))
 ```
 
 #### Joins
@@ -52,6 +70,12 @@ df = df.filter((df.age > 25) & (df.is_adult == 'Y'))
 ```python
 # Left join in another dataset
 df = df.join(person_lookup_table, 'person_id', 'left')
+
+# Match on different columns in left & right datasets
+df = df.join(other_table, df.id == other_table.person_id, 'left')
+
+# Match on multiple columns
+df = df.join(other_table, ['first_name', 'last_name'], 'left')
 
 # Useful for one-liner lookup code joins if you have a bunch
 def lookup_and_replace(df1, df2, df1_key, df2_key, df2_value):
@@ -66,7 +90,7 @@ def lookup_and_replace(df1, df2, df1_key, df2_key, df2_value):
 df = lookup_and_replace(people, pay_codes, id, pay_code_id, pay_code_desc)
 ```
 
-#### Creating New Columns
+#### Column Operations
 
 ```python
 # Add a new static column
@@ -76,37 +100,7 @@ df = df.withColumn('status', F.lit('PASS'))
 df = df.withColumn('full_name', F.when(
     (df.fname.isNotNull() & df.lname.isNotNull()), F.concat(df.fname, df.lname)
 ).otherwise(F.lit('N/A'))
-```
 
-#### Coalescing Values
-
-```python
-# Take the first value that is not null
-df = df.withColumn('last_name', F.coalesce(df.last_name, df.surname, F.lit('N/A')))
-```
-
-#### Casting, Nulls & Duplicates
-
-```python
-# Cast a column to a different type
-df = df.withColumn('price', df.price.cast(T.DoubleType()))
-
-# Replace all nulls with a specific value
-df = df.fillna({
-    'first_name': 'Tom',
-    'age': 0,
-})
-
-# Drop duplicate rows in a dataset (distinct)
-df = df.dropDuplicates()
-
-# Drop duplicate rows, but consider only specific columns
-df = df.dropDuplicates(['name', 'height'])
-```
-
-## Column Operations
-
-```python
 # Pick which columns to keep, optionally rename some
 df = df.select(
     'name',
@@ -126,6 +120,28 @@ df = df.select(*(F.col(c) for c in df2.columns))
 # Batch Rename/Clean Columns
 for col in df.columns:
     df = df.withColumnRenamed(col, col.lower().replace(' ', '_').replace('-', '_'))
+```
+
+#### Casting & Coalescing Null Values & Duplicates
+
+```python
+# Cast a column to a different type
+df = df.withColumn('price', df.price.cast(T.DoubleType()))
+
+# Replace all nulls with a specific value
+df = df.fillna({
+    'first_name': 'Tom',
+    'age': 0,
+})
+
+# Take the first value that is not null
+df = df.withColumn('last_name', F.coalesce(df.last_name, df.surname, F.lit('N/A')))
+
+# Drop duplicate rows in a dataset (distinct)
+df = df.dropDuplicates()
+
+# Drop duplicate rows, but consider only specific columns
+df = df.dropDuplicates(['name', 'height'])
 ```
 
 ## String Operations
@@ -199,16 +215,49 @@ df = df.withColumn('price', F.floor('price'))
 
 # Ceiling - F.ceil(col)
 df = df.withColumn('price', F.ceil('price'))
+
+# Absolute Value - F.abs(col)
+df = df.withColumn('price', F.abs('price'))
+
+# X raised to power Y – F.pow(x, y)
+df = df.withColumn('exponential_growth', F.pow('x', 'y'))
+
+# Select smallest value out of multiple columns – F.least(*cols)
+df = df.withColumn('least', F.least('subtotal', 'total'))
+
+# Select largest value out of multiple columns – F.greatest(*cols)
+df = df.withColumn('greatest', F.greatest('subtotal', 'total'))
 ```
 
-## Date Operations
+## Date & Timestamp Operations
 
 ```python
-# Convert a string of known format to a date
+# Convert a string of known format to a date (excludes time information)
 df = df.withColumn('date_of_birth', F.to_date('date_of_birth', 'yyyy-MM-dd'))
 
-# Keep only rows where date_of_birth is in the year 2017 
+# Convert a string of known format to a timestamp (includes time information)
+df = df.withColumn('time_of_birth', F.to_timestamp('time_of_birth', 'yyyy-MM-dd HH:mm:ss'))
+
+# Get year from date:       F.year(col)
+# Get month from date:      F.month(col)
+# Get day from date:        F.dayofmonth(col)
+# Get hour from date:       F.hour(col)
+# Get minute from date:     F.minute(col)
+# Get second from date:     F.second(col)
 df = df.filter(F.year('date_of_birth') == F.lit('2017'))
+
+# Add & subtract days
+df = df.withColumn('three_days_after', F.date_add('date_of_birth', 3))
+df = df.withColumn('three_days_before', F.date_sub('date_of_birth', 3))
+
+# Add & Subtract months
+df = df.withColumn('next_month', F.add_month('date_of_birth', 1))
+
+# Get number of days between two dates
+df = df.withColumn('days_between', F.datediff('start', 'end'))
+
+# Get number of months between two dates
+df = df.withColumn('months_between', F.months_between('start', 'end'))
 
 # Keep only rows where date_of_birth is between 2017-05-10 and 2018-07-21
 df = df.filter(
@@ -248,11 +297,11 @@ df = df.groupBy('age').agg(F.collect_set('name').alias('person_names'))
 #### Repartitioning
 
 ```python
-# Repartition – df.repartition(num_output_partitions)
+# Repartition – df.repartition(num_output_partitions)
 df = df.repartition(1)
 ```
 
-#### UDFs (User Defined Functions)
+#### UDFs (User Defined Functions
 
 ```python
 # Multiply each row's age column by two
