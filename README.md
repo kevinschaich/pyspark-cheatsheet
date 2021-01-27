@@ -5,7 +5,6 @@ A quick reference guide to the most commonly used patterns and functions in PySp
 #### Table of Contents
 
 - [Common Patterns](#common-patterns)
-    - [Logging Output](#logging-output)
     - [Importing Functions & Types](#importing-functions--types)
     - [Filtering](#filtering)
     - [Joins](#joins)
@@ -25,18 +24,6 @@ A quick reference guide to the most commonly used patterns and functions in PySp
 If you can't find what you're looking for, check out the [PySpark Official Documentation](https://spark.apache.org/docs/latest/api/python/pyspark.sql.html) and add it here!
 
 ## Common Patterns
-
-#### Logging Output
-
-```python
-# Within Code Workbooks
-print("example log output")
-
-# Within Code Repositories
-import logging
-logger = logging.getLogger(__name__)
-logger.info("example log output")
-```
 
 #### Importing Functions & Types
 
@@ -290,6 +277,13 @@ df = df.groupBy('gender').agg(F.max('age').alias('max_age_by_gender'))
 # Collect a Set of all Rows in Group:       F.collect_set(col)
 # Collect a List of all Rows in Group:      F.collect_list(col)
 df = df.groupBy('age').agg(F.collect_set('name').alias('person_names'))
+
+# Just take the lastest row for each combination (Window Functions)
+from pyspark.sql import Window as W
+df = df.withColumn("row_number", F.row_number().over(
+    W.partitionBy("first_name", "last_name")
+    .orderBy(F.desc("date"))
+)).filter(F.col("row_number") == 1).drop("row_number")
 ```
 
 ## Advanced Operations
