@@ -261,6 +261,9 @@ df = df.withColumn('full_name', F.array('fname', 'lname'))
 
 # Empty Array - F.array(*cols)
 df = df.withColumn('empty_array_column', F.array([]))
+
+# Array Size/Length – F.size(col)
+df = df.withColumn('array_length', F.size(F.col('my_array'))
 ```
 
 ## Aggregation Operations
