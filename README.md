@@ -129,6 +129,12 @@ df = df.dropDuplicates()
 
 # Drop duplicate rows, but consider only specific columns
 df = df.dropDuplicates(['name', 'height'])
+
+# Replace empty strings with null (leave out subset keyword arg to replace in all columns)
+df = df.replace({"": None}, subset=["name"])
+
+# Convert Python/PySpark/NumPy NaN operator to null
+df = df.replace(float("nan"), None)
 ```
 
 ## String Operations
@@ -283,10 +289,11 @@ df = df.groupBy('age').agg(F.collect_set('name').alias('person_names'))
 
 # Just take the lastest row for each combination (Window Functions)
 from pyspark.sql import Window as W
-df = df.withColumn("row_number", F.row_number().over(
-    W.partitionBy("first_name", "last_name")
-    .orderBy(F.desc("date"))
-)).filter(F.col("row_number") == 1).drop("row_number")
+
+window = W.partitionBy("first_name", "last_name").orderBy(F.desc("date"))
+df = df.withColumn("row_number", F.row_number().over(window))
+df = df.filter(F.col("row_number") == 1)
+df = df.drop("row_number")
 ```
 
 ## Advanced Operations
