@@ -9,6 +9,7 @@ A quick reference guide to the most commonly used patterns and functions in PySp
     - [Filtering](#filtering)
     - [Joins](#joins)
     - [Column Operations](#column-operations)
+    - [Profiling Missing Values](#profiling-missing-values)
     - [Casting & Coalescing Null Values & Duplicates](#casting--coalescing-null-values--duplicates)
 - [String Operations](#string-operations)
     - [String Filters](#string-filters)
@@ -107,6 +108,33 @@ df = df.select(*(F.col(c) for c in df2.columns))
 # Batch Rename/Clean Columns
 for col in df.columns:
     df = df.withColumnRenamed(col, col.lower().replace(' ', '_').replace('-', '_'))
+```
+
+#### Profiling Missing Values
+
+```python
+# count missing values in weight column
+missing_weight= (
+    df.select(
+        F.count(F.when(F.col('weight').isNull() | F.isnan(F.col('weight')), ''))
+        .alias('missing_weight'))
+)
+
+# count missing values in all the columns (assuming they are all in numeric types such as: double, int, etc.)
+missing_values= (
+    df.select([
+        F.count(F.when(F.col(c).isNull() | F.isnan(c), c))
+        .alias(c) for c in cols
+    ])
+)
+
+# show rounded percentage of missing values
+perc_missing_values= (
+    df.select([
+        F.round(F.count(F.when(F.isnan(c) | F.col(c).isNull(), c))/F.count(F.lit(1)), 2)
+        .alias(c) for c in cols
+    ])
+)
 ```
 
 #### Casting & Coalescing Null Values & Duplicates
