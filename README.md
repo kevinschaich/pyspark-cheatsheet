@@ -269,7 +269,13 @@ df = df.withColumn('full_name', F.array('fname', 'lname'))
 df = df.withColumn('empty_array_column', F.array([]))
 
 # Array Size/Length – F.size(col)
-df = df.withColumn('array_length', F.size(F.col('my_array')))
+df = df.withColumn('array_length', F.size('my_array'))
+
+# Flatten Array – F.flatten(col)
+df = df.withColumn('flattened', F.flatten('my_array'))
+
+# Unique/Distinct Elements – F.array_distinct(col)
+df = df.withColumn('unique_elements', F.array_distinct('my_array'))
 ```
 
 ## Aggregation Operations
