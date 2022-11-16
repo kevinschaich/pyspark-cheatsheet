@@ -68,7 +68,7 @@ df = df.join(other_table, ['first_name', 'last_name'], 'left')
 def lookup_and_replace(df1, df2, df1_key, df2_key, df2_value):
     return (
         df1
-        .join(df2[[df2_key, df2_value]], df1[df1_key] == df2[df2_key], 'left')
+        .join(df2[df2_key, df2_value], df1[df1_key] == df2[df2_key], 'left')
         .withColumn(df1_key, F.coalesce(F.col(df2_value), F.col(df1_key)))
         .drop(df2_key)
         .drop(df2_value)
