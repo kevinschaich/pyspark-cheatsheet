@@ -3,6 +3,7 @@
 A quick reference guide to the most commonly used patterns and functions in PySpark SQL.
 
 #### Table of Contents
+- [Quickstart](#quickstart)
 - [Basics](#basics)
 - [Common Patterns](#common-patterns)
     - [Importing Functions & Types](#importing-functions--types)
@@ -25,6 +26,24 @@ A quick reference guide to the most commonly used patterns and functions in PySp
 
 If you can't find what you're looking for, check out the [PySpark Official Documentation](https://spark.apache.org/docs/latest/api/python/pyspark.sql.html) and add it here!
 
+## Quickstart
+
+Install on macOS:
+
+```bash
+brew install apache-spark && pip install pyspark
+```
+
+Create your first DataFrame:
+
+```python
+from pyspark.sql import SparkSession
+
+spark = SparkSession.builder.getOrCreate()
+
+# I/O options: https://spark.apache.org/docs/latest/api/python/reference/pyspark.sql/io.html
+df = spark.read.csv('/path/to/your/input/file')
+```
 
 ## Basics
 
@@ -54,10 +73,19 @@ df.count()
 # Get column count
 len(df.columns)
 
-# Get results as list of PySpark Rows
+# Write output to disk
+df.write.csv('/path/to/your/output/file')
+
+# Get results (WARNING: in-memory) as list of PySpark Rows
 df = df.collect()
 
-# Convert to Pandas
+# Get results (WARNING: in-memory) as list of Python dicts
+dicts = [row.asDict() for row in df.collect()]
+
+# Get results (WARNING: in-memory) as JSON
+json = json.dumps([row.asDict() for row in df.limit(1).collect()], indent=4)
+
+# Convert (WARNING: in-memory) to Pandas DataFrame
 df = df.toPandas()
 ```
 
