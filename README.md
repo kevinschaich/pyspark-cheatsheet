@@ -55,6 +55,10 @@ df.show()
 df.head(5)
 df.tail(5)
 
+# Show preview as JSON (WARNING: in-memory)
+df = df.limit(10) # optional
+print(json.dumps([row.asDict(recursive=True) for row in df.collect()], indent=2))
+
 # Limit actual DataFrame to n rows (non-deterministic)
 df = df.limit(5)
 
@@ -81,9 +85,6 @@ df = df.collect()
 
 # Get results (WARNING: in-memory) as list of Python dicts
 dicts = [row.asDict() for row in df.collect()]
-
-# Get results (WARNING: in-memory) as JSON
-json = json.dumps([row.asDict() for row in df.limit(1).collect()], indent=4)
 
 # Convert (WARNING: in-memory) to Pandas DataFrame
 df = df.toPandas()
