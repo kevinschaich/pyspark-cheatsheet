@@ -16,14 +16,51 @@ A quick reference guide to the most commonly used patterns and functions in PySp
 - [Number Operations](#number-operations)
 - [Date & Timestamp Operations](#date--timestamp-operations)
 - [Array Operations](#array-operations)
+- [Struct Operations](#struct-operations)
 - [Aggregation Operations](#aggregation-operations)
 - [Advanced Operations](#advanced-operations)
     - [Repartitioning](#repartitioning)
     - [UDFs (User Defined Functions](#udfs-user-defined-functions)
+- [Useful Functions / Tranformations](#useful-functions--transformations)
 
 If you can't find what you're looking for, check out the [PySpark Official Documentation](https://spark.apache.org/docs/latest/api/python/pyspark.sql.html) and add it here!
 
 ## Common Patterns
+
+#### Basics
+
+```python
+# Show a preview
+df.show()
+
+# Show preview of first / last n rows
+df.head(5)
+df.tail(5)
+
+# Limit actual DataFrame to n rows (non-deterministic)
+df = df.limit(5)
+
+# Get columns
+df.columns
+
+# Get columns + column types
+df.dtypes
+
+# Get schema
+df.schema
+
+# Get row count
+df.count()
+
+# Get column count
+len(df.columns)
+
+# Get results as list of PySpark Rows
+df = df.collect()
+
+# Convert to Pandas
+df = df.toPandas()
+```
 
 #### Importing Functions & Types
 
@@ -125,7 +162,8 @@ df = df.fillna({
 df = df.withColumn('last_name', F.coalesce(df.last_name, df.surname, F.lit('N/A')))
 
 # Drop duplicate rows in a dataset (distinct)
-df = df.dropDuplicates()
+df = df.dropDuplicates() # or
+df = df.distinct()
 
 # Drop duplicate rows, but consider only specific columns
 df = df.dropDuplicates(['name', 'height'])
@@ -268,6 +306,9 @@ df = df.withColumn('full_name', F.array('fname', 'lname'))
 # Empty Array - F.array(*cols)
 df = df.withColumn('empty_array_column', F.array([]))
 
+# Get element at index – col.getItem(n)
+df = df.withColumn('first_element', F.col("my_array").getItem(0))
+
 # Array Size/Length – F.size(col)
 df = df.withColumn('array_length', F.size('my_array'))
 
@@ -276,7 +317,24 @@ df = df.withColumn('flattened', F.flatten('my_array'))
 
 # Unique/Distinct Elements – F.array_distinct(col)
 df = df.withColumn('unique_elements', F.array_distinct('my_array'))
+
+# Map over & transform array elements – F.transform(col, func: col -> col)
+df = df.withColumn('elem_ids', F.transform(F.col('my_array'), lambda x: x.getField('id')))
+
+# Return a row per array element – F.explode(col)
+df = df.select(F.explode('my_array'))
 ```
+
+## Struct Operations
+
+```python
+# Make a new Struct column (similar to Python's `dict()`) – F.struct(*cols)
+df = df.withColumn('my_struct', F.struct(F.col('col_a'), F.col('col_b')))
+
+# Get item from struct by key – col.getField(str)
+df = df.withColumn('col_a', F.col('my_struct').getField('col_a'))
+```
+
 
 ## Aggregation Operations
 
@@ -323,4 +381,25 @@ import random
 
 random_name_udf = F.udf(lambda: random.choice(['Bob', 'Tom', 'Amy', 'Jenna']))
 df = df.withColumn('name', random_name_udf())
+```
+
+## Useful Functions / Transformations
+
+```python
+def flatten(df: DataFrame, delimiter="_") -> DataFrame:
+    '''
+    Flatten nested struct columns in `df` by one level separated by `delimiter`, i.e.:
+
+    df = [ {'a': {'b': 1, 'c': 2} } ]
+    df = flatten(df, '_')
+    -> [ {'a_b': 1, 'a_c': 2} ]
+    '''
+    flat_cols = [name for name, type in df.dtypes if not type.startswith("struct")]
+    nested_cols = [name for name, type in df.dtypes if type.startswith("struct")]
+
+    flat_df = df.select(
+        flat_cols
+        + [F.col(nc + "." + c).alias(nc + delimiter + c) for nc in nested_cols for c in df.select(nc + ".*").columns]
+    )
+    return flat_df
 ```
