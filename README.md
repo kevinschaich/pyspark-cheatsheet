@@ -3,7 +3,7 @@
 A quick reference guide to the most commonly used patterns and functions in PySpark SQL.
 
 #### Table of Contents
-
+- [Basics](#basics)
 - [Common Patterns](#common-patterns)
     - [Importing Functions & Types](#importing-functions--types)
     - [Filtering](#filtering)
@@ -25,9 +25,8 @@ A quick reference guide to the most commonly used patterns and functions in PySp
 
 If you can't find what you're looking for, check out the [PySpark Official Documentation](https://spark.apache.org/docs/latest/api/python/pyspark.sql.html) and add it here!
 
-## Common Patterns
 
-#### Basics
+## Basics
 
 ```python
 # Show a preview
@@ -61,6 +60,8 @@ df = df.collect()
 # Convert to Pandas
 df = df.toPandas()
 ```
+
+## Common Patterns
 
 #### Importing Functions & Types
 
@@ -100,18 +101,6 @@ df = df.join(other_table, df.id == other_table.person_id, 'left')
 
 # Match on multiple columns
 df = df.join(other_table, ['first_name', 'last_name'], 'left')
-
-# Useful for one-liner lookup code joins if you have a bunch
-def lookup_and_replace(df1, df2, df1_key, df2_key, df2_value):
-    return (
-        df1
-        .join(df2[[df2_key, df2_value]], df1[df1_key] == df2[df2_key], 'left')
-        .withColumn(df1_key, F.coalesce(F.col(df2_value), F.col(df1_key)))
-        .drop(df2_key)
-        .drop(df2_value)
-    )
-
-df = lookup_and_replace(people, pay_codes, id, pay_code_id, pay_code_desc)
 ```
 
 #### Column Operations
@@ -402,4 +391,21 @@ def flatten(df: DataFrame, delimiter="_") -> DataFrame:
         + [F.col(nc + "." + c).alias(nc + delimiter + c) for nc in nested_cols for c in df.select(nc + ".*").columns]
     )
     return flat_df
+
+
+def lookup_and_replace(df1, df2, df1_key, df2_key, df2_value):
+    '''
+    Replace every value in `df1`'s `df1_key` column with the corresponding value
+    `df2_value` from `df2` where `df1_key` matches `df2_key`
+
+    df = lookup_and_replace(people, pay_codes, id, pay_code_id, pay_code_desc)
+    '''
+    return (
+        df1
+        .join(df2[[df2_key, df2_value]], df1[df1_key] == df2[df2_key], 'left')
+        .withColumn(df1_key, F.coalesce(F.col(df2_value), F.col(df1_key)))
+        .drop(df2_key)
+        .drop(df2_value)
+    )
+
 ```
