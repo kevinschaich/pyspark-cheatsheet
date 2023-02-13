@@ -84,7 +84,7 @@ df.write.csv('/path/to/your/output/file')
 df = df.collect()
 
 # Get results (WARNING: in-memory) as list of Python dicts
-dicts = [row.asDict() for row in df.collect()]
+dicts = [row.asDict(recursive=True) for row in df.collect()]
 
 # Convert (WARNING: in-memory) to Pandas DataFrame
 df = df.toPandas()
