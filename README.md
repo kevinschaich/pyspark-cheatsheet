@@ -281,6 +281,9 @@ df = df.withColumn('greatest', F.greatest('subtotal', 'total'))
 ## Date & Timestamp Operations
 
 ```python
+# Add a column with the current date
+df = df.withColumn('current_date', F.current_date())
+
 # Convert a string of known format to a date (excludes time information)
 df = df.withColumn('date_of_birth', F.to_date('date_of_birth', 'yyyy-MM-dd'))
 
